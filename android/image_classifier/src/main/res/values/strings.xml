@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PaddlePaddle</string>
+    <string name="action_settings">Settings</string>
+</resources>
