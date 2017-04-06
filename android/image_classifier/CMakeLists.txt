@@ -4,42 +4,21 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds it for you.
-# Gradle automatically packages shared libraries with your APK.
+# NDK pre-build library: log
+find_library(log-lib log)
 
-add_library( # Sets the name of the library.
-             native-lib
+# Prebuilt third-party library: paddle
+set(PADDLE_ROOT ${CMAKE_SOURCE_DIR}/../paddle)
+add_library(paddle_inference SHARED IMPORTED)
+set_target_properties(paddle_inference PROPERTIES IMPORTED_LOCATION
+                      ${PADDLE_ROOT}/lib/${ANDROID_ABI}/libpaddle_capi_shared.so)
 
-             # Sets the library as a shared library.
-             SHARED
+add_library(image_classifier SHARED
+            src/main/cpp/ImageClassifier_jni.cpp)
 
-             # Provides a relative path to your source file(s).
-             # Associated headers in the same location as their source
-             # file are automatically included.
-             src/main/cpp/native-lib.cpp )
+target_include_directories(image_classifier PRIVATE
+                           ${PADDLE_ROOT}/include)
 
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because system libraries are included in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
-
-find_library( # Sets the name of the path variable.
-              log-lib
-
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
-
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in the
-# build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
-                       native-lib
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+target_link_libraries(image_classifier
+                      paddle_inference
+                      ${log-lib})
