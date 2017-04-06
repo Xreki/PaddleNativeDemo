@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class PaddleDemoActivity extends AppCompatActivity {
+public class ImageClassifierActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
