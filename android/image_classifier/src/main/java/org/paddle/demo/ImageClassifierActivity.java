@@ -14,8 +14,10 @@ limitations under the License. */
 
 package org.paddle.demo;
 
-import android.media.Image;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,10 +27,31 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+
+import org.paddle.utils.FileUtils;
+
 public class ImageClassifierActivity extends AppCompatActivity {
 
     private static final String TAG = "ImageClassifierActivity";
     private ImageClassifier classifier;
+
+    private static final String URL = "http://paddlepaddle.bj.bcebos.com/model_zoo/imagenet/resnet_50.tar.gz";
+    private static final String CONFIG = "resnet_50/resnet_50.bin";
+    private static final String PARAMS = "resnet_50/resnet_50.zip";
+    private static float[] MEANS = {103.939F, 116.779F, 123.680F};
+
+    private static int IMAGE_HEIGHT = 224;
+    private static int IMAGE_WIDTH = 224;
+    private static int IMAGE_CHANNEL = 3;
+
+    private ImageView recogImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +60,15 @@ public class ImageClassifierActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        classifier = ImageClassifier.create();
+        recogImageView = (ImageView) findViewById(R.id.recog_image);
+
+        classifier = ImageClassifier.create(getAssets(), CONFIG, PARAMS, MEANS);
+
+        Bitmap bitmap = FileUtils.getBitmapFromAssets(getAssets(), "images/dog_400x400.jpg");
+        recogImageView.setImageBitmap(bitmap);
+
+        classifier.recognize(bitmap, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNEL);
+        classifier.analyze();
 
         final TextView tv = (TextView) findViewById(R.id.sample_text);
 
@@ -47,7 +78,7 @@ public class ImageClassifierActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Read a bitmap from gallery", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                tv.setText(classifier.stringFromJNI());
+                tv.setText("Hello PaddlePaddle");
             }
         });
     }
@@ -74,4 +105,48 @@ public class ImageClassifierActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private String download(String httpUrl, String dir, String filename) {
+        if (httpUrl == null || httpUrl.length() == 0 || dir == null || dir.length() == 0) {
+            return null;
+        }
+
+        String targetDir = FileUtils.getSDPath() + "/" + dir;
+        if (FileUtils.isDirExist(targetDir, true) == -1) {
+            Log.e(TAG, "Directory (" + targetDir + ") does not exists.");
+            return null;
+        }
+
+        String targetPath = targetDir + "/" + filename + ".tar.gz";
+        Log.i(TAG, "Download: " + httpUrl + " -> " + targetPath);
+
+        URL url = null;
+        try {
+            url = new URL(httpUrl);
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        try {
+            URLConnection conn = url.openConnection();
+            InputStream is = conn.getInputStream();
+            byte[] buffer = FileUtils.readInputStream(is);
+
+            File file = new File(filename);
+            FileOutputStream fs = new FileOutputStream(file);
+            fs.write(buffer);
+
+            if (fs != null) {
+                fs.close();
+            }
+            if (is != null) {
+                is.close();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Download failure.");
+            return null;
+        }
+
+        return null;
+    }
 }

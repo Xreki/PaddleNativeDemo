@@ -14,7 +14,11 @@ limitations under the License. */
 
 package org.paddle.demo;
 
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.util.Log;
+
+import org.paddle.utils.FileUtils;
 
 public class ImageClassifier {
 
@@ -24,21 +28,125 @@ public class ImageClassifier {
     }
 
     private static final String TAG = "ImageClassifier";
+    private static final String WORK_DIR = "/data/local/tmp/paddle_demo/image_classifier/model";
+    private String[] tables = null;
+    private long gradientMachine = 0;
+    private float[] means = null;
+    private float[] probabilities = null;
 
     private ImageClassifier() {}
 
-    public static ImageClassifier create() {
+    public static ImageClassifier create(AssetManager assetManager,
+                                         String assetConfig,
+                                         String assetParams,
+                                         float[] means) {
         ImageClassifier classifier = new ImageClassifier();
-        return classifier;
+
+        classifier.means = means;
+
+        // String params = classifier.prepare(assetManager, assetParams);
+        String params = FileUtils.getSDPath() + "/" + WORK_DIR + "/resnet_50";
+        Log.i(TAG, "config (in assets): " + assetConfig);
+        Log.i(TAG, "params (in sd card): " + params);
+
+        classifier.gradientMachine = init(assetManager, assetConfig, params);
+        if (classifier.gradientMachine == 0) {
+            Log.e(TAG, "Create ImageClassifier failure.");
+            return null;
+        } else {
+            return classifier;
+        }
     }
 
-    public void recognize(Bitmap bitmap) {
+    public void recognize(Bitmap bitmap, int height, int width, int channel) {
+        if (bitmap == null || bitmap.isRecycled()) {
+            return;
+        }
 
+        if (gradientMachine == 0 || means.length != channel) {
+            return;
+        }
+
+        Bitmap target = null;
+        if (bitmap.getHeight() != height || bitmap.getWidth() != width) {
+            target = Bitmap.createScaledBitmap(bitmap, width, height, false);
+        } else {
+            target = bitmap;
+        }
+
+        int[] pixels = new int[height * width];
+        target.getPixels(pixels, 0, width, 0, 0, width, height);
+        if (bitmap != target) {
+            target.recycle();
+        }
+
+        byte[] rgbs = new byte[height * width * channel];
+        for (int i = 0; i < height * width; i++) {
+            int color = pixels[i];
+            int red = (color >> 16) & 0xFF;
+            int green = (color >> 8) & 0xFF;
+            int blue = color & 0xFF;
+
+            if (channel == 3) {
+                // chw
+                rgbs[0 * height * width + i] = (byte) red;
+                rgbs[1 * height * width + i] = (byte) green;
+                rgbs[2 * height * width + i] = (byte) blue;
+                // hwc
+                // rgbs[i * channel + 0] = (byte) red;
+                // rgbs[i * channel + 1] = (byte) green;
+                // rgbs[i * channel + 2] = (byte) blue;
+            } else {
+                if ((red == green) && (green == blue)) {
+                    rgbs[i] = (byte) red;
+                } else {
+                    rgbs[i] = (byte) (red * 0.11 + green * 0.59 + blue * 0.3);
+                }
+            }
+        }
+
+        probabilities = null;
+        probabilities = inference(gradientMachine, means, rgbs, height, width, channel);
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    public void analyze() {
+        if (probabilities == null) {
+            return;
+        }
+
+        int maxid = 0;
+        for (int i = 0; i < probabilities.length; i++) {
+            if (probabilities[i] > probabilities[maxid]) {
+                maxid = i;
+            }
+        }
+        Log.i(TAG, "type: " + maxid + ", probs: " + probabilities[maxid]);
+    }
+
+    private String prepare(AssetManager asset, String assetPath) {
+        String workDir = FileUtils.getSDPath() + "/" + WORK_DIR;
+        // String workDir = WORK_DIR;
+        if (FileUtils.isDirExist(workDir, true) == -1) {
+            Log.e(TAG, "Work directory (" + workDir + ") does not exist.");
+            return null;
+        }
+
+        String zipPath = FileUtils.copyBigDataToExternal(asset, assetPath, workDir);
+        if (zipPath != null) {
+            return FileUtils.unzipFiles(zipPath, workDir);
+        } else {
+            return null;
+        }
+    }
+
+    private static native long init(AssetManager assetManager, String config, String params);
+
+    private native float[] inference(long gradientMachine,
+                                     float[] means,
+                                     byte[] pixels,
+                                     int height,
+                                     int width,
+                                     int channel);
+
+    private native int release(long gradientMachine);
 }

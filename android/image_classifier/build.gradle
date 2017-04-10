@@ -15,8 +15,8 @@ android {
         }
         externalNativeBuild {
             cmake {
-                // arguments "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_PLATFORM=android-21", "-DANDROID_ARM_NEON=TRUE"
-                cppFlags "-frtti -fexceptions"
+                arguments "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_PLATFORM=android-21", "-DANDROID_ARM_NEON=FALSE"
+                cppFlags "-O3"
             }
         }
     }
@@ -31,7 +31,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile "src/main/AndroidManifest.xml"
-            java.srcDirs = ["src/main/java"]
+            java.srcDirs = ["src/main/java", "../utils"]
             assets.srcDirs = ["src/main/assets"]
             jni.srcDirs = ["src/main/cpp"]
             jniLibs.srcDirs = ["../paddle/lib"]
