@@ -33,12 +33,11 @@ import org.paddle.utils.FileUtils;
 public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
 
     private static final String TAG = "OCRecognizerActivity";
-    private StaticTable table;
     private OpticalCharacterRecognizer recognizer;
 
     private static final String CONFIG = "vgg_attention_eng/config.bin";
     private static final String PARAMS = "vgg_attention_eng/vgg_attention_eng.zip";
-    private static float[] MEANS = {127.0F};
+    private static float[] MEANS = {127.5F};
 
     private static final int IMAGE_HEIGHT = 48;
     private static final int IMAGE_CHANNEL = 1;
@@ -52,7 +51,7 @@ public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        table = StaticTable.create(NUM_CLASSES);
+        StaticTable table = StaticTable.create(NUM_CLASSES);
         recognizer = OpticalCharacterRecognizer.create(getAssets(),
                                                        CONFIG,
                                                        PARAMS,

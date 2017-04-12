@@ -17,8 +17,8 @@ from paddle.trainer_config_helpers import *
 paper: https://arxiv.org/abs/1512.03385
 """
 is_test = get_config_arg("is_test", bool, False)
-is_predict = get_config_arg("is_predict", bool, False)
-data_provider = get_config_arg("data_provider", bool, True)
+is_predict = get_config_arg("is_predict", bool, True)
+data_provider = get_config_arg("data_provider", bool, False)
 layer_num = get_config_arg("layer_num", int, 50)
 
 if not is_predict and data_provider:
@@ -28,7 +28,7 @@ if not is_predict and data_provider:
     # If you use three mean value, set like:
     # "mean_value:103.939,116.779,123.68;"
     args = {
-        'mean_meta': "model/mean_meta_224/mean.meta",
+        'mean_meta': [103.939,116.779,123.68],
         'image_size': 224,
         'crop_size': 224,
         'color': True,
@@ -178,10 +178,10 @@ def deep_res_net(res2_num=3, res3_num=4, res4_num=6, res5_num=3):
     """
     # For ImageNet
     # conv1: 112x112
-    img = data_layer(name='input', size=224 * 224 * 3)
+    data = data_layer(name='input', size=224 * 224 * 3)
     tmp = conv_bn_layer(
         "conv1",
-        img,
+        data,
         filter_size=7,
         channels=3,
         num_filters=64,
@@ -237,9 +237,14 @@ def deep_res_net(res2_num=3, res3_num=4, res4_num=6, res5_num=3):
         name='output', input=tmp, size=1000, act=SoftmaxActivation())
 
     if not is_predict:
-        classification_cost(
-            input=output, label=data_layer(
-                name='label', size=1))
+        label = data_layer(name='label', size=1)
+        cost = classification_cost(name='cost', input=output, label=label)
+
+        inputs(data, label)
+        outputs(cost)
+    else:
+        inputs(data)
+        outputs(output)
 
 
 def res_net_50():
@@ -254,12 +259,13 @@ def res_net_152():
     deep_res_net(3, 8, 36, 3)
 
 
-if not is_predict:
-    Inputs("input", "label")
-else:
-    Inputs("input")
-# Outputs("cost-softmax" if not is_predict else "output")
-Outputs("res5_3_branch2c_conv", "res5_3_branch2c_bn")
+#if not is_predict:
+#    Inputs("input", "label")
+#    Outputs("cost")
+#else:
+#    Inputs("input")
+#    Outputs("output")
+
 
 if layer_num == 50:
     res_net_50()

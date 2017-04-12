@@ -18,7 +18,7 @@ limitations under the License. */
 #include <string>
 #include <paddle/capi.h>
 
-#include "common.h"
+#include "../../../../utils/cpp/common.h"
 
 extern "C" {
 
@@ -47,9 +47,8 @@ Java_org_paddle_demo_ImageClassifier_init(JNIEnv *env,
   // Create a gradient machine for inference.
   paddle_gradient_machine gradient_machine = 0;
   CHECK(paddle_gradient_machine_create_for_inference(&gradient_machine, buf, (int) size), 0);
-  // CHECK(paddle_gradient_machine_randomize_param(machine), 0);
 
-  // Loading parameter. Uncomment the following line and change the directory.
+  // Loading parameter.
   const char *params = env->GetStringUTFChars(jparams, 0);
   CHECK(paddle_gradient_machine_load_parameter_from_disk(gradient_machine, params),
         0);
@@ -68,7 +67,7 @@ Java_org_paddle_demo_ImageClassifier_inference(JNIEnv *env,
                                                jint jwidth,
                                                jint jchannel) {
   if (jgradient_machine == 0 || jpixels == NULL ||
-      jheight <= 0 || jwidth <=0 || (jchannel != 1 && jchannel != 3)) {
+      jheight <= 0 || jwidth <=0 || jchannel != 3) {
     LOGE("invalid argumens, jgradient_machine = %ld, jmeans = %p, jpixels = %p, "
          "jheight = %d, jwidth = %d, jchannel = %d",
          jgradient_machine, jmeans, jpixels, jheight, jwidth, jchannel);
@@ -126,6 +125,13 @@ Java_org_paddle_demo_ImageClassifier_inference(JNIEnv *env,
 
   paddle_real* output = NULL;
   CHECK(paddle_matrix_get_row(probs, 0, &output), NULL);
+
+  LOGI("output: %lld x %lld", probs_height, probs_width);
+  for (uint64_t i = 0; i < probs_height; i++) {
+    for (uint64_t j = 0; j < probs_width; j++) {
+      LOGI("(%lld, %lld): %f", i, j, output[i * probs_width + j]);
+    }
+  }
 
   LOGI("Copy the results back to java.");
   int results_length = (int) (probs_height * probs_width);

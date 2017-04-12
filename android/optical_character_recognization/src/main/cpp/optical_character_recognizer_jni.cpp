@@ -16,7 +16,6 @@ limitations under the License. */
 #include <android/asset_manager_jni.h>
 
 #include <iostream>
-#include <string>
 #include <paddle/capi.h>
 
 #include "../../../../utils/cpp/common.h"
@@ -53,7 +52,6 @@ Java_org_paddle_demo_OpticalCharacterRecognizer_init(JNIEnv *env,
   LOGI("Create a gradient machine for inference.");
   paddle_gradient_machine gradient_machine = 0;
   CHECK(paddle_gradient_machine_create_for_inference(&gradient_machine, buf, (int) size), 0);
-  // CHECK(paddle_gradient_machine_randomize_param(machine), 0);
 
   LOGI("Loading parameter.");
   const char *params = env->GetStringUTFChars(jparams, 0);

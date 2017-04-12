@@ -18,8 +18,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import org.paddle.utils.FileUtils;
-
 public class ImageClassifier {
 
     // Used to load the 'image_classifier' library on application startup.
@@ -28,8 +26,7 @@ public class ImageClassifier {
     }
 
     private static final String TAG = "ImageClassifier";
-    private static final String WORK_DIR = "paddle_demo/image_classifier/model";
-    private String[] tables = null;
+    private String[] table = null;
     private long gradientMachine = 0;
     private float[] means = null;
     private float[] probabilities = null;
@@ -38,18 +35,18 @@ public class ImageClassifier {
 
     public static ImageClassifier create(AssetManager assetManager,
                                          String assetConfig,
-                                         String assetParams,
-                                         float[] means) {
+                                         String sdcardParams,
+                                         float[] means,
+                                         String[] table) {
         ImageClassifier classifier = new ImageClassifier();
 
         classifier.means = means;
+        classifier.table = table;
 
-        // String params = classifier.prepare(assetManager, assetParams);
-        String params = FileUtils.getSDPath() + "/" + WORK_DIR + "/resnet_50";
         Log.i(TAG, "config (in assets): " + assetConfig);
-        Log.i(TAG, "params (in sd card): " + params);
+        Log.i(TAG, "params (in sd card): " + sdcardParams);
 
-        classifier.gradientMachine = init(assetManager, assetConfig, params);
+        classifier.gradientMachine = init(assetManager, assetConfig, sdcardParams);
         if (classifier.gradientMachine == 0) {
             Log.e(TAG, "Create ImageClassifier failure.");
             return null;
@@ -68,6 +65,7 @@ public class ImageClassifier {
         }
 
         Bitmap target = null;
+        Log.i(TAG, bitmap.getHeight() + " x " + bitmap.getWidth());
         if (bitmap.getHeight() != height || bitmap.getWidth() != width) {
             target = Bitmap.createScaledBitmap(bitmap, width, height, false);
         } else {
@@ -109,9 +107,9 @@ public class ImageClassifier {
         probabilities = inference(gradientMachine, means, rgbs, height, width, channel);
     }
 
-    public void analyze() {
+    public String analyze() {
         if (probabilities == null) {
-            return;
+            return null;
         }
 
         int maxid = 0;
@@ -120,22 +118,25 @@ public class ImageClassifier {
                 maxid = i;
             }
         }
-        Log.i(TAG, "type: " + maxid + ", probs: " + probabilities[maxid]);
+
+        String result = null;
+        if (table != null && table.length > maxid) {
+            result = "type: " + maxid + ", probs: " + probabilities[maxid] +
+                     ", " + table[maxid];
+        } else {
+            result = "type: " + maxid + ", probs: " + probabilities[maxid];
+        }
+        Log.i(TAG, result);
+        return result;
     }
 
-    private String prepare(AssetManager asset, String assetPath) {
-        String workDir = FileUtils.getSDPath() + "/" + WORK_DIR;
-        // String workDir = WORK_DIR;
-        if (FileUtils.isDirExist(workDir, true) == -1) {
-            Log.e(TAG, "Work directory (" + workDir + ") does not exist.");
-            return null;
-        }
+    public float[] getOutput() {
+        return probabilities;
+    }
 
-        String zipPath = FileUtils.copyBigDataToExternal(asset, assetPath, workDir);
-        if (zipPath != null) {
-            return FileUtils.unzipFiles(zipPath, workDir);
-        } else {
-            return null;
+    public void release() {
+        if (release(gradientMachine) != 0) {
+            Log.i(TAG, "error happened in releasing process.");
         }
     }
 

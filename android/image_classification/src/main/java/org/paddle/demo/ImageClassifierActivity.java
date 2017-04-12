@@ -36,6 +36,7 @@ import java.net.URLConnection;
 import java.net.MalformedURLException;
 
 import org.paddle.utils.FileUtils;
+import org.paddle.utils.TableReader;
 
 public class ImageClassifierActivity extends AppCompatActivity {
 
@@ -43,15 +44,15 @@ public class ImageClassifierActivity extends AppCompatActivity {
     private ImageClassifier classifier;
 
     private static final String URL = "http://paddlepaddle.bj.bcebos.com/model_zoo/imagenet/resnet_50.tar.gz";
+    private static final String WORK_DIR = "paddle_demo/image_classifier";
     private static final String CONFIG = "resnet_50/resnet_50.bin";
-    private static final String PARAMS = "resnet_50/resnet_50.zip";
-    private static float[] MEANS = {103.939F, 116.779F, 123.680F};
+
+    // private static float[] MEANS = {103.939F, 116.779F, 123.680F};
+    private static float[] MEANS = {123.680F, 116.779F, 103.939F};
 
     private static final int IMAGE_HEIGHT = 224;
     private static final int IMAGE_WIDTH = 224;
     private static final int IMAGE_CHANNEL = 3;
-
-    private ImageView recogImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +61,18 @@ public class ImageClassifierActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        recogImageView = (ImageView) findViewById(R.id.recog_image);
+        String sdcardTable = FileUtils.getSDPath() + "/" + WORK_DIR + "/imagenet_1000_labels.txt";
+        TableReader reader = TableReader.create(sdcardTable);
 
-        classifier = ImageClassifier.create(getAssets(), CONFIG, PARAMS, MEANS);
+        String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/model/resnet_50";
+        classifier = ImageClassifier.create(getAssets(),
+                                            CONFIG,
+                                            sdcardParams,
+                                            MEANS,
+                                            reader.getTable());
 
-        Bitmap bitmap = FileUtils.getBitmapFromAssets(getAssets(), "images/dog_400x400.jpg");
-        recogImageView.setImageBitmap(bitmap);
-
-        classifier.recognize(bitmap, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNEL);
-        classifier.analyze();
-
-        final TextView tv = (TextView) findViewById(R.id.sample_text);
+        final ImageView recogImageView = (ImageView) findViewById(R.id.recog_image);
+        final TextView tv = (TextView) findViewById(R.id.recog_result);
 
         FloatingActionButton galleryFab = (FloatingActionButton) findViewById(R.id.gallery_fab);
         galleryFab.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +80,14 @@ public class ImageClassifierActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Read a bitmap from gallery", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                tv.setText("Hello PaddlePaddle");
+
+                Bitmap bitmap = FileUtils.getBitmapFromAssets(getAssets(), "images/chicken_224x224.png");
+                recogImageView.setImageBitmap(bitmap);
+
+                classifier.recognize(bitmap, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNEL);
+                String showStr = classifier.analyze();
+
+                tv.setText(showStr);
             }
         });
     }
