@@ -1,1 +1,1 @@
-include ':image_classifier'
+include ':image_classifier', ':optical_character_recognizer'
