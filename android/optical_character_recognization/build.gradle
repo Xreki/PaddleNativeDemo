@@ -52,6 +52,7 @@ android {
             manifest.srcFile "src/main/AndroidManifest.xml"
             java.srcDirs = ["src/main/java", "../utils/java"]
             assets.srcDirs = ["src/main/assets"]
+            res.srcDirs = ["src/main/res"]
             jni.srcDirs = ["src/main/cpp", "../utils/cpp"]
             jniLibs.srcDirs = ["../paddle/lib"]
         }
