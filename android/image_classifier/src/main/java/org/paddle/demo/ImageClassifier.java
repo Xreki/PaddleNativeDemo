@@ -28,7 +28,7 @@ public class ImageClassifier {
     }
 
     private static final String TAG = "ImageClassifier";
-    private static final String WORK_DIR = "/data/local/tmp/paddle_demo/image_classifier/model";
+    private static final String WORK_DIR = "paddle_demo/image_classifier/model";
     private String[] tables = null;
     private long gradientMachine = 0;
     private float[] means = null;

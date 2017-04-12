@@ -15,15 +15,16 @@
   ~ limitations under the License. */
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_paddle_demo"
+    android:id="@+id/content_optical_character_recognizer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="org.paddle.demo.ImageClassifierActivity"
-    tools:showIn="@layout/paddle_demo_activity">
+    tools:context="org.paddle.demo.OpticalCharacterRecognizerActivity"
+    tools:showIn="@layout/activity_optical_character_recognizer">
 
     <LinearLayout
         android:layout_width="match_parent"

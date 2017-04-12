@@ -47,9 +47,9 @@ public class ImageClassifierActivity extends AppCompatActivity {
     private static final String PARAMS = "resnet_50/resnet_50.zip";
     private static float[] MEANS = {103.939F, 116.779F, 123.680F};
 
-    private static int IMAGE_HEIGHT = 224;
-    private static int IMAGE_WIDTH = 224;
-    private static int IMAGE_CHANNEL = 3;
+    private static final int IMAGE_HEIGHT = 224;
+    private static final int IMAGE_WIDTH = 224;
+    private static final int IMAGE_CHANNEL = 3;
 
     private ImageView recogImageView;
 
