@@ -15,8 +15,6 @@
 set -e
 
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
-ASSETS=$DIR/src/main/assets
-cd $ASSETS
 
 echo "Downloading ResNet models..."
 
@@ -24,13 +22,12 @@ echo "Downloading ResNet models..."
 for filename in resnet_50
 do 
   file=${filename}.tar.gz
-  mkdir $filename
-  cd $filename
+  cd $DIR/$filename
   wget http://paddlepaddle.bj.bcebos.com/model_zoo/imagenet/$file
   tar -xvf $file
   mv filename model
   rm $file
-  cd $ASSETS
+  cd $DIR
 done
 
 echo "Done."

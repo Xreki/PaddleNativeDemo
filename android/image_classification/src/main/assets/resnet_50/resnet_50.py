@@ -17,8 +17,8 @@ from paddle.trainer_config_helpers import *
 paper: https://arxiv.org/abs/1512.03385
 """
 is_test = get_config_arg("is_test", bool, False)
-is_predict = get_config_arg("is_predict", bool, True)
-data_provider = get_config_arg("data_provider", bool, False)
+is_predict = get_config_arg("is_predict", bool, False)
+data_provider = get_config_arg("data_provider", bool, True)
 layer_num = get_config_arg("layer_num", int, 50)
 
 if not is_predict and data_provider:

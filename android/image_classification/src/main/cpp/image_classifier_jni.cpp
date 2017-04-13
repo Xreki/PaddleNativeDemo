@@ -90,19 +90,11 @@ Java_org_paddle_demo_ImageClassifier_inference(JNIEnv *env,
 
   const unsigned char* pixels = (unsigned char *) env->GetByteArrayElements(jpixels, 0);
   const float* means = (const float *) env->GetFloatArrayElements(jmeans, 0);
-#if 1
   for (int i = 0; i < jchannel; i++) {
     for (int j = 0; j < jheight * jwidth; j++) {
       input[i * jheight * jwidth + j] = (float) pixels[i * jheight * jwidth + j] - means[i];
     }
   }
-#else
-  for (int i = 0; i < jheight * jwidth; i++) {
-    for (int j = 0; j < jchannel; j++) {
-      input[i * jchannel + j] = (float) pixels[i * jchannel + j] - means[j];
-    }
-  }
-#endif
   env->ReleaseByteArrayElements(jpixels, (jbyte *) pixels, 0);
   env->ReleaseFloatArrayElements(jmeans, (jfloat *) means, 0);
 
@@ -125,13 +117,6 @@ Java_org_paddle_demo_ImageClassifier_inference(JNIEnv *env,
 
   paddle_real* output = NULL;
   CHECK(paddle_matrix_get_row(probs, 0, &output), NULL);
-
-  LOGI("output: %lld x %lld", probs_height, probs_width);
-  for (uint64_t i = 0; i < probs_height; i++) {
-    for (uint64_t j = 0; j < probs_width; j++) {
-      LOGI("(%lld, %lld): %f", i, j, output[i * probs_width + j]);
-    }
-  }
 
   LOGI("Copy the results back to java.");
   int results_length = (int) (probs_height * probs_width);
