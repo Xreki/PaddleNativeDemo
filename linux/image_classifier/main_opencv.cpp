@@ -127,8 +127,10 @@ int main() {
   CHECK(paddle_gradient_machine_randomize_param(machine));
 
   //    Loading parameter. Uncomment the following line and change the directory.
-  CHECK(paddle_gradient_machine_load_parameter_from_disk(machine,
-                                                         "resnet_50/resnet_50"));
+  // CHECK(paddle_gradient_machine_load_parameter_from_disk(machine,
+  //                                                        "resnet_50/resnet_50"));
+  char* params = (char *) read_config("resnet_50.weights", &size);
+  CHECK(paddle_gradient_machine_load_parameter_from_buffer(machine, params, size));
 
   // Step 3: Prepare input Arguments
   paddle_arguments in_args = paddle_arguments_create_none();

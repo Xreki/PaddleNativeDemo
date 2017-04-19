@@ -21,8 +21,13 @@ int main() {
 
   printf("        Loading parameter. Uncomment the following line and change "
          "the directory.\n");
-  CHECK(paddle_gradient_machine_load_parameter_from_disk(machine,
-                                                 "vgg_attention_eng/model"));
+  // CHECK(paddle_gradient_machine_load_parameter_from_disk(machine,
+  //                                                "vgg_attention_eng/model"));
+  long params_size = 0;
+  char* params = (char *) read_config("vgg_attention_eng.weights", &params_size);
+  CHECK(paddle_gradient_machine_load_parameter_from_buffer(machine,
+                                                           params,
+                                                           params_size));
 
   printf("Step 3: Prepare input Arguments.\n");
   paddle_arguments in_args = paddle_arguments_create_none();
