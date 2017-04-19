@@ -37,7 +37,7 @@ limitations under the License. */
     }                                                                   \
   }
 
-static void* read_config_external(const char* filename, long* size) {
+static void* read_binary_external(const char* filename, long* size) {
   FILE* file = fopen(filename, "r");
   if (file == NULL) {
     return NULL;
@@ -60,11 +60,11 @@ static void* read_config_external(const char* filename, long* size) {
   return buf;
 }
 
-static void* read_config_asset(AAssetManager *aasset_manager,
+static void* read_binary_asset(AAssetManager *aasset_manager,
                                const char* filename,
                                long* size) {
   if (aasset_manager != NULL) {
-    AAsset *asset = AAssetManager_open(aasset_manager, filename, AASSET_MODE_UNKNOWN);
+    AAsset *asset = AAssetManager_open(aasset_manager, filename, AASSET_MODE_STREAMING);
 
     if (asset != NULL) {
       *size = AAsset_getLength(asset);
@@ -86,12 +86,12 @@ static void* read_config_asset(AAssetManager *aasset_manager,
   return NULL;
 }
 
-static void* read_config(AAssetManager *aasset_manager,
+static void* read_binary(AAssetManager *aasset_manager,
                          const char* filename,
                          long* size) {
-  void* buf = read_config_asset(aasset_manager, filename, size);
+  void* buf = read_binary_asset(aasset_manager, filename, size);
   if (buf == NULL) {
-    buf = read_config_external(filename, size);
+    buf = read_binary_external(filename, size);
   }
   return buf;
 }

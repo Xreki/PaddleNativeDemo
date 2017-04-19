@@ -11,10 +11,12 @@ set_target_properties(paddle_inference PROPERTIES IMPORTED_LOCATION
                       ${PADDLE_ROOT}/lib/${ANDROID_ABI}/libpaddle_capi_shared.so)
 
 add_library(optical_character_recognizer SHARED
-            src/main/cpp/optical_character_recognizer_jni.cpp)
+            src/main/cpp/optical_character_recognizer_jni.cpp
+            ${CMAKE_SOURCE_DIR}/../utils/cpp/android_log_wrapper.cpp)
 
 target_include_directories(optical_character_recognizer PRIVATE
-                           ${PADDLE_ROOT}/include)
+                           ${PADDLE_ROOT}/include
+                           ${CMAKE_SOURCE_DIR}/../utils/cpp)
 
 target_link_libraries(optical_character_recognizer
                       paddle_inference

@@ -45,10 +45,10 @@ public class ImageClassifierActivity extends AppCompatActivity {
 
     private static final String URL = "http://paddlepaddle.bj.bcebos.com/model_zoo/imagenet/resnet_50.tar.gz";
     private static final String WORK_DIR = "paddle_demo/image_classifier";
-    private static final String CONFIG = "resnet_50/resnet_50.bin";
+    private static final String CONFIG_PATH = "resnet_50/resnet_50.bin";
+    private static final String PARAMS_PATH = "resnet_t0/resnet_50.weights";
 
-    // private static float[] MEANS = {103.939F, 116.779F, 123.680F};
-    private static float[] MEANS = {123.680F, 116.779F, 103.939F};
+    private static float[] MEANS = {103.939F, 116.779F, 123.680F};
 
     private static final int IMAGE_HEIGHT = 224;
     private static final int IMAGE_WIDTH = 224;
@@ -64,9 +64,10 @@ public class ImageClassifierActivity extends AppCompatActivity {
         String sdcardTable = FileUtils.getSDPath() + "/" + WORK_DIR + "/imagenet_1000_labels.txt";
         TableReader reader = TableReader.create(sdcardTable);
 
+        // String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/resnet_50.weights";
         String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/model/resnet_50";
         classifier = ImageClassifier.create(getAssets(),
-                                            CONFIG,
+                                            CONFIG_PATH,
                                             sdcardParams,
                                             MEANS,
                                             reader.getTable());

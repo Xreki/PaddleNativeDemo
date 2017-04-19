@@ -86,10 +86,10 @@ public class ImageClassifier {
             int blue = color & 0xFF;
 
             if (channel == 3) {
-                // chw
-                rgbs[0 * height * width + i] = (byte) red;
+                // chw, bgr
+                rgbs[0 * height * width + i] = (byte) blue;
                 rgbs[1 * height * width + i] = (byte) green;
-                rgbs[2 * height * width + i] = (byte) blue;
+                rgbs[2 * height * width + i] = (byte) red;
                 // hwc
                 // rgbs[i * channel + 0] = (byte) red;
                 // rgbs[i * channel + 1] = (byte) green;
