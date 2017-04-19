@@ -35,8 +35,8 @@ public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
     private static final String TAG = "OCRecognizerActivity";
     private OpticalCharacterRecognizer recognizer;
 
-    private static final String CONFIG = "vgg_attention_eng/config.bin";
-    private static final String PARAMS = "vgg_attention_eng/vgg_attention_eng.zip";
+    private static final String CONFIG_PATH = "vgg_attention_eng/config.bin";
+    private static final String PARAMS_PATH = "vgg_attention_eng/vgg_attention_eng.weights";
     private static float[] MEANS = {127.5F};
 
     private static final int IMAGE_HEIGHT = 48;
@@ -53,8 +53,8 @@ public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
 
         StaticTable table = StaticTable.create(NUM_CLASSES);
         recognizer = OpticalCharacterRecognizer.create(getAssets(),
-                                                       CONFIG,
-                                                       PARAMS,
+                                                       CONFIG_PATH,
+                                                       PARAMS_PATH,
                                                        MEANS,
                                                        table.getTable());
 

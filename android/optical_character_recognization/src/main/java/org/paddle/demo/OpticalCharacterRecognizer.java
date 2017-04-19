@@ -49,11 +49,11 @@ public class OpticalCharacterRecognizer {
         recognizer.table = table;
 
         // String params = classifier.prepare(assetManager, assetParams);
-        String params = FileUtils.getSDPath() + "/" + WORK_DIR + "/vgg_attention_eng";
+        // String params = FileUtils.getSDPath() + "/" + WORK_DIR + "/vgg_attention_eng";
         Log.i(TAG, "config (in assets): " + assetConfig);
-        Log.i(TAG, "params (in sd card): " + params);
+        Log.i(TAG, "params (in sd card): " + assetParams);
 
-        recognizer.gradientMachine = init(assetManager, assetConfig, params);
+        recognizer.gradientMachine = init(assetManager, assetConfig, assetParams);
         if (recognizer.gradientMachine == 0) {
             Log.e(TAG, "Create OpticalCharacterRecognizer failure.");
             return null;

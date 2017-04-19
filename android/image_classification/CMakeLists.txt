@@ -11,10 +11,12 @@ set_target_properties(paddle_inference PROPERTIES IMPORTED_LOCATION
                       ${PADDLE_ROOT}/lib/${ANDROID_ABI}/libpaddle_capi_shared.so)
 
 add_library(image_classifier SHARED
-            src/main/cpp/image_classifier_jni.cpp)
+            src/main/cpp/image_classifier_jni.cpp
+            ${CMAKE_SOURCE_DIR}/../utils/cpp/android_log_wrapper.cpp)
 
 target_include_directories(image_classifier PRIVATE
-                           ${PADDLE_ROOT}/include)
+                           ${PADDLE_ROOT}/include
+                           ${CMAKE_SOURCE_DIR}/../utils/cpp)
 
 target_link_libraries(image_classifier
                       paddle_inference

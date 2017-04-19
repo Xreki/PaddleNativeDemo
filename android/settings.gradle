@@ -1,1 +1,1 @@
-include ':image_classification', ':optical_character_recognization'
+include ':image_classification', ':optical_character_recognization', ':paddle_core'
