@@ -31,7 +31,10 @@ android {
         }
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_PLATFORM=android-21", "-DANDROID_ARM_NEON=FALSE"
+                arguments "-DANDROID_TOOLCHAIN=gcc",
+                          "-DANDROID_PLATFORM=android-21",
+                          "-DANDROID_ARM_NEON=FALSE",
+                          "-DCMAKE_VERBOSE_MAKEFILE=1"
                 cppFlags "-O3 -std=c++11"
             }
         }
