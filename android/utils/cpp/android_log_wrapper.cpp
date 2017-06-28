@@ -14,19 +14,19 @@ static const char* TAG = "PaddlePaddle";
 
 static void* thread_func(void *) {
   size_t rdsz;
-  char buf[128];
+  char buf[256];
   while ((rdsz = read(pfd[0], buf, sizeof(buf) - 1)) > 0) {
     if (buf[rdsz - 1] == '\n') {
       rdsz--;
     }
     buf[rdsz] = 0; // add null-terminator
-    __android_log_write(ANDROID_LOG_INFO, TAG, buf);
+    __android_log_write(ANDROID_LOG_DEBUG, TAG, buf);
   }
   return 0;
 }
 
-int start_logger() {
-  /* _IOLBE: line-buffered
+int android_start_logger() {
+  /* _IOLBF: line-buffered
    * _IONBF: unbuffered
    * Make sure both stdout and stderr line-buffered
    */
@@ -35,8 +35,8 @@ int start_logger() {
 
   /* Create the pipe and redirect stdout and stderr */
   pipe(pfd);
-  dup2(pfd[1], 1);
-  dup2(pfd[1], 2);
+  dup2(pfd[1], STDOUT_FILENO);
+  dup2(pfd[1], STDERR_FILENO);
 
   /* Spawn the logging thread */
   if (pthread_create(&thread, 0, thread_func, 0) == -1) {

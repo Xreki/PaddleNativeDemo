@@ -64,8 +64,8 @@ public class ImageClassifierActivity extends AppCompatActivity {
         String sdcardTable = FileUtils.getSDPath() + "/" + WORK_DIR + "/imagenet_1000_labels.txt";
         TableReader reader = TableReader.create(sdcardTable);
 
-        // String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/resnet_50.weights";
-        String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/model/resnet_50";
+        String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/resnet_50.weights";
+        // String sdcardParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/model/resnet_50";
         classifier = ImageClassifier.create(getAssets(),
                                             CONFIG_PATH,
                                             sdcardParams,

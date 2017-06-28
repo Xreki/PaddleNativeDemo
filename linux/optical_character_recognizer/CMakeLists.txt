@@ -1,9 +1,11 @@
 project(optical_character_recognizer)
 cmake_minimum_required(VERSION 2.8)
 
-find_package(Protobuf 3.1)
-if(PROTOBUF_FOUND)
-    message(STATUS "Found Protobuf: " ${PROTOBUF_LIBRARY})  
+if(NOT CMAKE_CROSSCOMPILING)
+    find_package(Protobuf 3.1)
+    if(PROTOBUF_FOUND)
+        message(STATUS "Found Protobuf: " ${PROTOBUF_LIBRARY})  
+    endif()
 endif()
 
 if(NOT PADDLE_ROOT)
@@ -12,7 +14,8 @@ endif()
 
 find_path(PADDLE_INC_DIR paddle/capi.h PATHS ${PADDLE_ROOT}/include)
 find_library(PADDLE_SHARED_LIB NAMES paddle_capi_shared PATHS
-    ${PADDLE_ROOT}/lib)
+    ${PADDLE_ROOT}/lib
+    ${PADDLE_ROOT}/lib/${CMAKE_ANDROID_ARCH_ABI})
 
 if(PADDLE_INC_DIR AND PADDLE_STATIC_LIB)
     set(PADDLE_LIBRARY ${PADDLE_STATIC_LIB})

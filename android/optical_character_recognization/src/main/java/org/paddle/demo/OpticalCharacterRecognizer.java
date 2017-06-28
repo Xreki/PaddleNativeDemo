@@ -48,8 +48,7 @@ public class OpticalCharacterRecognizer {
         recognizer.means = means;
         recognizer.table = table;
 
-        // String params = classifier.prepare(assetManager, assetParams);
-        // String params = FileUtils.getSDPath() + "/" + WORK_DIR + "/vgg_attention_eng";
+        assetParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/vgg_attention_eng.weights";
         Log.i(TAG, "config (in assets): " + assetConfig);
         Log.i(TAG, "params (in sd card): " + assetParams);
 

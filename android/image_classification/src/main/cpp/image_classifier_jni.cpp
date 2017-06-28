@@ -18,7 +18,7 @@ limitations under the License. */
 #include <string>
 #include <paddle/capi.h>
 
-#include "../../../../utils/cpp/common.h"
+#include "common.h"
 #include "android_log_wrapper.h"
 
 extern "C" {
@@ -33,7 +33,7 @@ Java_org_paddle_demo_ImageClassifier_init(JNIEnv *env,
     return 0;
   }
 
-  start_logger();
+  android_start_logger();
 
   LOGI("Initalize Paddle environment.");
   char *argv[] = {"--use_gpu=False"};

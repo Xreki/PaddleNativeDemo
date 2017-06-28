@@ -4,4 +4,4 @@
 
 #pragma once
 
-int start_logger();
+int android_start_logger();

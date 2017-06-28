@@ -38,8 +38,9 @@ limitations under the License. */
   }
 
 static void* read_binary_external(const char* filename, long* size) {
-  FILE* file = fopen(filename, "r");
+  FILE* file = fopen(filename, "rb");
   if (file == NULL) {
+    LOGW("%s open failure.", filename);
     return NULL;
   }
 
@@ -49,6 +50,7 @@ static void* read_binary_external(const char* filename, long* size) {
 
   void* buf = malloc(*size);
   if (buf == NULL) {
+    LOGE("memory allocation failure, size %ld.", *size);
     return NULL;
   }
 
@@ -71,16 +73,22 @@ static void* read_binary_asset(AAssetManager *aasset_manager,
 
       void *buf = (char *) malloc(*size);
       if (buf == NULL) {
+        LOGW("memory allocation failure, size %ld", *size);
         return NULL;
       }
 
       if (AAsset_read(asset, buf, *size) > 0) {
+        AAsset_close(asset);
         return buf;
+      } else {
+        LOGW("read %s failure, size %ld.", filename, *size);
       }
-    }
 
-    AAsset_close(asset);
-    asset = NULL;
+      AAsset_close(asset);
+      asset = NULL;
+    } else {
+      LOGW("%s does not exist in assets.", filename);
+    }
   }
 
   return NULL;
