@@ -28,10 +28,12 @@ set(SRC_FILES src/main/cpp/optical_character_recognizer_jni.cpp
               src/main/cpp/paddle_inference.cpp
               ${CMAKE_SOURCE_DIR}/../utils/cpp/android_log_wrapper.cpp)
 
+set(LINK_FLAGS "-Wl,--version-script ${CMAKE_CURRENT_SOURCE_DIR}/paddle_jni.map")
 add_library(optical_character_recognizer SHARED ${SRC_FILES})
+set_target_properties(optical_character_recognizer PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
 target_include_directories(optical_character_recognizer PRIVATE
-                           ${PADDLE_ROOT}/include
+                           ${PADDLE_INC_DIR}
                            ${CMAKE_SOURCE_DIR}/../utils/cpp)
 
 target_link_libraries(optical_character_recognizer
