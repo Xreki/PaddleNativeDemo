@@ -35,7 +35,6 @@ public class OpticalCharacterRecognizer {
     private float[] means = null;
     private String[] table = null;
     private float[] probs = null;
-    private int[] labels = null;
 
     private OpticalCharacterRecognizer() {}
 
@@ -109,39 +108,39 @@ public class OpticalCharacterRecognizer {
         probs = inference(gradientMachine, means, rgbs, height, width, channel);
     }
 
-    public String[] analyze() {
-        if (labels == null || table == null) {
+    public String analyze() {
+        if (probs == null || table == null) {
             return null;
         }
 
-        int numStrings = 0;
-        for (int i = 0; i < labels.length; i++) {
-            if (labels[i] == -1) {
-                numStrings++;
-            }
-        }
+        int numClasses = table.length;
+        int sequenceLength = probs.length / numClasses;
+        Log.i(TAG, "numClasses: " + numClasses + ", sequenceLength: " + sequenceLength);
 
-        String[] results = new String[numStrings];
-        int index = 0;
-        results[index] = "";
-        for (int i = 1; i < labels.length; ) {
-            if (labels[i] != -1) {
-                results[index] += table[labels[i]];
-                i++;
-            } else {
-                index++;
-                if (index < numStrings) {
-                    results[index] = "";
+        int[] labels = new int[sequenceLength];
+        for (int i = 0; i < sequenceLength; i++) {
+            int maxid = 0;
+            float maxProbs = 0;
+            for (int j = 0; j < numClasses; j++) {
+                if (probs[i * numClasses + j] > maxProbs) {
+                    maxProbs = probs[i * numClasses + j];
+                    maxid = j;
                 }
-                i += 2;
+            }
+            Log.i(TAG, "i: " + i + ", maxid: " + maxid + ", maxProbs: " + maxProbs + ", " + table[maxid]);
+            labels[i] = maxid;
+        }
+
+        String result = "";
+        int blank = numClasses - 1;
+        for (int i = 0; i < labels.length; i++) {
+            if (labels[i] != blank) {
+                result += table[labels[i]];
             }
         }
+        Log.i(TAG, "result: " + result);
 
-        for (int i = 0; i < results.length; i++) {
-            Log.i(TAG, i + ": " + results[i]);
-        }
-
-        return results;
+        return result;
     }
 
     private static native long init(AssetManager assetManager, String mergedModel);

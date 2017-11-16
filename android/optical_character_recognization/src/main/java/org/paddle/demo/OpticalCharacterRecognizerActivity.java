@@ -39,7 +39,7 @@ public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
     private static final int IMAGE_HEIGHT = 48;
     private static final int IMAGE_CHANNEL = 1;
 
-    private static final int NUM_CLASSES = 97;
+    private static final int NUM_CLASSES = 96;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,17 +64,13 @@ public class OpticalCharacterRecognizerActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                Bitmap bitmap = FileUtils.getBitmapFromAssets(getAssets(), "images/eng_48x48.jpg");
+                Bitmap bitmap = FileUtils.getBitmapFromAssets(getAssets(), "images/00000_0000.jpg");
                 recogImageView.setImageBitmap(bitmap);
 
                 recognizer.recognize(bitmap, IMAGE_HEIGHT, IMAGE_CHANNEL);
-                String[] results = recognizer.analyze();
-                String showStr = "";
-                for (int i = 0; i < results.length; i++) {
-                    showStr += i + ": " + results[i] + "\n";
-                }
+                String result = recognizer.analyze();
 
-                tv.setText(showStr);
+                tv.setText(result);
             }
         });
     }

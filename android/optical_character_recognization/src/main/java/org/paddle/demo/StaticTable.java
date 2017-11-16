@@ -35,8 +35,6 @@ public class StaticTable {
         handle.table = new String[numClasses];
 
         int index = 0;
-        handle.table[index++] = "";
-        handle.table[index++] = "";
         handle.table[index++] = "!";
         handle.table[index++] = "\"";
         handle.table[index++] = "#";
