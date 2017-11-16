@@ -12,14 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from paddle.trainer_config_helpers import *
+
 """
 paper: https://arxiv.org/abs/1512.03385
 """
-is_test = get_config_arg("is_test", bool, False)
-is_predict = get_config_arg("is_predict", bool, False)
-data_provider = get_config_arg("data_provider", bool, True)
-layer_num = get_config_arg("layer_num", int, 50)
+is_test = os.environ.get("is_test")
+is_predict = os.environ.get("is_predict")
+data_provider = bool(os.environ.get("data_provider"))
+layer_num = os.environ.get("layer_num")
+
+if is_test is None:
+    is_test = False
+else:
+    is_test = bool(is_test)
+if is_predict is None:
+    is_predict = False
+else:
+    is_predict = bool(is_predict)
+if data_provider is None:
+    data_provider = True
+else:
+    data_provider = bool(data_provider)
+if layer_num is None:
+    layer_num = 50
+else:
+    layer_num = int(layer_num)
 
 if not is_predict and data_provider:
     train_list = 'train.list' if not is_test else None
@@ -258,14 +277,6 @@ def res_net_101():
 
 def res_net_152():
     deep_res_net(3, 8, 36, 3)
-
-
-#if not is_predict:
-#    Inputs("input", "label")
-#    Outputs("cost")
-#else:
-#    Inputs("input")
-#    Outputs("output")
 
 
 if layer_num == 50:
