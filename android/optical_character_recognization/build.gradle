@@ -18,7 +18,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.1'
 
     defaultConfig {
         applicationId "org.paddle.demo"
@@ -34,7 +34,6 @@ android {
         }
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_PLATFORM=android-21", "-DANDROID_ARM_NEON=FALSE"
                 cppFlags "-O3 -std=c++11"
             }
         }
@@ -54,7 +53,6 @@ android {
             assets.srcDirs = ["src/main/assets"]
             res.srcDirs = ["src/main/res"]
             jni.srcDirs = ["src/main/cpp", "../utils/cpp"]
-            jniLibs.srcDirs = ["../paddle/lib"]
         }
     }
 

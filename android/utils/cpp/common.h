@@ -17,7 +17,7 @@ limitations under the License. */
 
 #include <android/log.h>
 #include <android/asset_manager.h>
-#include <streambuf>
+#include <stdlib.h>
 
 #define TAG  "PaddlePaddle"
 
@@ -103,68 +103,5 @@ static void* read_binary(AAssetManager *aasset_manager,
   }
   return buf;
 }
-
-class AndroidStreamBuf : public std::streambuf {
-public:
-  enum LogType {
-    INFO = 0,
-    WARNING = 1,
-    ERROR = 2,
-  };
-
-  AndroidStreamBuf(LogType type = INFO) : type_(type) {
-    buffer_[BUFFER_SIZE] = '\0';
-    setp(buffer_, buffer_ + BUFFER_SIZE - 1);
-  }
-
-  ~AndroidStreamBuf() { sync(); }
-
-protected:
-  virtual int_type overflow(int_type c) {
-    if (c != EOF) {
-      *pptr() = c;
-      pbump(1);
-    }
-    flush_buffer();
-    return c;
-  }
-
-  virtual int sync() {
-    flush_buffer();
-    return 0;
-  }
-
-private:
-  int flush_buffer() {
-    int len = int(pptr() - pbase());
-    if (len <= 0) {
-      return 0;
-    }
-
-    if (len <= BUFFER_SIZE) {
-      buffer_[BUFFER_SIZE] = '\0';
-    }
-
-    if (type_ == INFO) {
-      LOGI("%s", buffer_);
-    } else if (type_ == WARNING) {
-      LOGW("%s", buffer_);
-    } else if (type_ == ERROR) {
-      LOGE("%s", buffer_);
-    } else {
-      printf("%s", buffer_);
-    }
-
-    pbump(-len);
-    return len;
-  }
-
-private:
-  enum {
-    BUFFER_SIZE = 255,
-  };
-  char buffer_[BUFFER_SIZE + 1];
-  LogType type_;
-};
 
 #endif // ANDROID_COMMON_H

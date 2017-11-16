@@ -30,17 +30,17 @@ public class OpticalCharacterRecognizer {
     }
 
     private static final String TAG = "OCRecognizer";
-    private static final String WORK_DIR = "paddle_demo/optical_character_recognizer/model";
+    private static final String WORK_DIR = "paddle_demo/optical_character_recognizer";
     private long gradientMachine = 0;
     private float[] means = null;
     private String[] table = null;
+    private float[] probs = null;
     private int[] labels = null;
 
     private OpticalCharacterRecognizer() {}
 
     public static OpticalCharacterRecognizer create(AssetManager assetManager,
-                                                    String assetConfig,
-                                                    String assetParams,
+                                                    String assetMergedModel,
                                                     float[] means,
                                                     String[] table) {
         OpticalCharacterRecognizer recognizer = new OpticalCharacterRecognizer();
@@ -48,11 +48,7 @@ public class OpticalCharacterRecognizer {
         recognizer.means = means;
         recognizer.table = table;
 
-        assetParams = FileUtils.getSDPath() + "/" + WORK_DIR + "/vgg_attention_eng.weights";
-        Log.i(TAG, "config (in assets): " + assetConfig);
-        Log.i(TAG, "params (in sd card): " + assetParams);
-
-        recognizer.gradientMachine = init(assetManager, assetConfig, assetParams);
+        recognizer.gradientMachine = init(assetManager, assetMergedModel);
         if (recognizer.gradientMachine == 0) {
             Log.e(TAG, "Create OpticalCharacterRecognizer failure.");
             return null;
@@ -109,8 +105,8 @@ public class OpticalCharacterRecognizer {
             }
         }
 
-        labels = null;
-        labels = inference(gradientMachine, means, rgbs, height, width, channel);
+        probs = null;
+        probs = inference(gradientMachine, means, rgbs, height, width, channel);
     }
 
     public String[] analyze() {
@@ -148,14 +144,14 @@ public class OpticalCharacterRecognizer {
         return results;
     }
 
-    private static native long init(AssetManager assetManager, String config, String params);
+    private static native long init(AssetManager assetManager, String mergedModel);
 
-    private native int[] inference(long gradientMachine,
-                                   float[] means,
-                                   byte[] pixels,
-                                   int height,
-                                   int width,
-                                   int channel);
+    private native float[] inference(long gradientMachine,
+                                     float[] means,
+                                     byte[] pixels,
+                                     int height,
+                                     int width,
+                                     int channel);
 
     private native int release(long gradientMachine);
 }
